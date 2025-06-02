@@ -1,13 +1,12 @@
 import os
-import io
 import json
 from flask import Flask, request, jsonify
-from ocr import ocr_process, extract_pills_from_text
+from ocr import ocr_process
+from postprocessing import extract_pills_from_text
 
 app = Flask(__name__)
 
-# 업로드된 파일을 저장할 디렉토리 설정
-UPLOAD_FOLDER = "/Users/yunseo/Desktop/development/smapill/ai_google_ocr/image"
+UPLOAD_FOLDER = "../"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
@@ -18,7 +17,6 @@ def upload_file():
         return jsonify({"error": "No file part in the request"}), 400
 
     file = request.files["file"]
-
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
@@ -33,7 +31,6 @@ def process_image():
         data = request.get_json()
         image_path = data.get("file_path")
 
-        # OCR 및 알약 추출
         text = ocr_process(image_path)
         if text:
             pills = extract_pills_from_text(text)
